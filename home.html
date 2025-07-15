@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Equal Sum Boxes Puzzle - Home</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #4f9dff, #8be8ff);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+      padding-top: 100px;
+    }
+    .container {
+      background: rgba(0,0,0,0.3);
+      display: inline-block;
+      padding: 40px;
+      border-radius: 10px;
+    }
+    input {
+      font-size: 18px;
+      padding: 10px;
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      font-size: 20px;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #ffcc00;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Equal Sum Boxes Puzzle</h1>
+    <p>Enter your name to start:</p>
+    <input type="text" id="playerName" placeholder="Your name" />
+    <br />
+    <button onclick="saveName()">Start Game</button>
+    <p id="error" style="color: red; margin-top: 20px;"></p>
+  </div>
+
+  <script>
+    function saveName() {
+      const name = document.getElementById("playerName").value.trim();
+      const error = document.getElementById("error");
+      error.textContent = "";
+
+      if (name === "") {
+        error.textContent = "Please enter your name.";
+        return;
+      }
+
+      fetch("http://localhost:5000/api/saveName", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = "index.html";
+        } else {
+          error.textContent = "Failed to save name.";
+        }
+      })
+      .catch(err => {
+        error.textContent = "Error connecting to server.";
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>
