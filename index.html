@@ -251,7 +251,6 @@ function goRandomLevel() {
   game.classList.add("active");
   startGame();
 }
-
 function saveName() {
   const name = document.getElementById("playerName").value.trim();
   if (!name) {
@@ -259,30 +258,72 @@ function saveName() {
     return;
   }
 
-  fetch("http://localhost:5000/api/saveName", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      playerName = name;
-      score = 0;
-      scoreDisplay.textContent = `🏆 Score: ${score}`;
-      home.classList.remove("active");
-      navbar.style.display = "flex";
-      game.classList.add("active");
-      startGame();
-    } else {
-      alert("Error saving name.");
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Server error.");
-  });
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    // This runs locally on your computer
+    fetch("http://localhost:5000/api/saveName", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        playerName = name;
+        home.classList.remove("active");
+        navbar.style.display = "flex";
+        game.classList.add("active");
+        startGame();
+      } else {
+        alert("Error saving name.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error connecting to the server.");
+    });
+  } else {
+    // This runs on GitHub Pages (no backend)
+    playerName = name;
+    home.classList.remove("active");
+    navbar.style.display = "flex";
+    game.classList.add("active");
+    startGame();
+  }
 }
+
+
+//for localhost
+// function saveName() {
+//   const name = document.getElementById("playerName").value.trim();
+//   if (!name) {
+//     alert("Please enter your name!");
+//     return;
+//   }
+
+//   fetch("http://localhost:5000/api/saveName", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ name })
+//   })
+//   .then(res => res.json())
+//   .then(data => {
+//     if (data.success) {
+//       playerName = name;
+//       score = 0;
+//       scoreDisplay.textContent = `🏆 Score: ${score}`;
+//       home.classList.remove("active");
+//       navbar.style.display = "flex";
+//       game.classList.add("active");
+//       startGame();
+//     } else {
+//       alert("Error saving name.");
+//     }
+//   })
+//   .catch(err => {
+//     console.error(err);
+//     alert("Server error.");
+//   });
+// }
 
 function selectLevel(lvl) {
   score = 0;
