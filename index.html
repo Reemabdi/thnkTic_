@@ -154,13 +154,6 @@
       font-weight: bold;
       font-size: 18px;
     }
-    .info-bar {
-      display: flex;
-      justify-content: flex-end;
-      padding: 10px 30px;
-      font-size: 20px;
-      gap: 30px;
-    }
   </style>
 </head>
 <body>
@@ -179,12 +172,13 @@
 <div class="home active" id="home">
   <h1>Think Tic</h1>
   <input type="text" id="playerName" placeholder="Enter your name" style="padding:10px; font-size:16px; width:250px;"/>
-  <button class="btn" onclick="saveName()">Start Game</button>
+  <button class="btn" onclick="startNewGame()">Start Game</button>
   <button class="btn" onclick="goRandomLevel()">Professional Start</button>
   <div class="info">
     How to play?
     <div class="tooltip">
-      Drag the numbers into the boxes so all boxes have the same total.<br>
+      Tap a number, then tap the box where you want to place it.<br>
+      Make sure all boxes have the same total.<br>
       Complete stages to level up.<br>
       Random Level never ends and combines features of the first three levels.<br><br>
       <button class="btn" style="font-size:14px; padding:5px 10px;" onclick="switchLanguage()">Switch to Arabic</button>
@@ -193,21 +187,14 @@
 </div>
 
 <div class="game" id="game">
-  <!-- Comment out display of level/stage if you want it hidden for now -->
-  <!--
-  <div id="levelDisplay">🔢 Level: 1</div>
-  <div id="stageDisplay">🎯 Stage: 1 / 10</div>
-  -->
-  <!-- <div class="controls">
-    <button class="btn" onclick="selectLevel(1)">Level 1</button>
-    <button class="btn" onclick="selectLevel(2)">Level 2</button>
-    <button class="btn" onclick="selectLevel(3)">Level 3</button>
-    <button class="btn" onclick="selectLevel(4)">Random Level</button>
-  </div> -->
+  <!-- Comment out level/stage if hidden -->
+  <!-- <div id="levelDisplay">🔢 Level: 1</div> -->
+  <!-- <div id="stageDisplay">🎯 Stage: 1 / 10</div> -->
+
   <div class="draggables" id="draggables"></div>
   <div class="box-container" id="boxContainer"></div>
   <div class="message" id="resultMessage"></div>
-  <button id="startBtn" class="btn" onclick="startGame()">🎮 Start New Game</button>
+  <button id="startBtn" class="btn" onclick="startNewGame()">🎮 Start New Game</button>
 </div>
 
 <script>
@@ -221,15 +208,12 @@ let stage = 1;
 let fixedNumbers = [];
 let boxCount = 3;
 let randomSettings = {};
-let isMobile = window.innerWidth < 768;
 let selectedNumber = null;
 
 const home = document.getElementById("home");
 const game = document.getElementById("game");
 const timerDisplay = document.getElementById("timer");
 const scoreDisplay = document.getElementById("score");
-const levelDisplay = document.getElementById("levelDisplay");
-const stageDisplay = document.getElementById("stageDisplay");
 const draggables = document.getElementById("draggables");
 const boxContainer = document.getElementById("boxContainer");
 const resultMessage = document.getElementById("resultMessage");
@@ -241,95 +225,37 @@ function goHome() {
   home.classList.add("active");
 }
 
-function goRandomLevel() {
-  score = 0;
-  scoreDisplay.textContent = `🏆 Score: ${score}`;
-  level = 4;
-  stage = 1;
-  home.classList.remove("active");
-  navbar.style.display = "flex";
-  game.classList.add("active");
-  startGame();
-}
-function saveName() {
+function startNewGame() {
   const name = document.getElementById("playerName").value.trim();
   if (!name) {
     alert("Please enter your name!");
     return;
   }
-
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    // This runs locally on your computer
-    fetch("http://localhost:5000/api/saveName", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        playerName = name;
-        home.classList.remove("active");
-        navbar.style.display = "flex";
-        game.classList.add("active");
-        startGame();
-      } else {
-        alert("Error saving name.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error connecting to the server.");
-    });
-  } else {
-    // This runs on GitHub Pages (no backend)
-    playerName = name;
-    home.classList.remove("active");
-    navbar.style.display = "flex";
-    game.classList.add("active");
-    startGame();
-  }
+  playerName = name;
+  score = 0;
+  level = 1;
+  stage = 1;
+  scoreDisplay.textContent = `🏆 Score: ${score}`;
+  home.classList.remove("active");
+  navbar.style.display = "flex";
+  game.classList.add("active");
+  startGame();
 }
 
-
-//for localhost
-// function saveName() {
-//   const name = document.getElementById("playerName").value.trim();
-//   if (!name) {
-//     alert("Please enter your name!");
-//     return;
-//   }
-
-//   fetch("http://localhost:5000/api/saveName", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ name })
-//   })
-//   .then(res => res.json())
-//   .then(data => {
-//     if (data.success) {
-//       playerName = name;
-//       score = 0;
-//       scoreDisplay.textContent = `🏆 Score: ${score}`;
-//       home.classList.remove("active");
-//       navbar.style.display = "flex";
-//       game.classList.add("active");
-//       startGame();
-//     } else {
-//       alert("Error saving name.");
-//     }
-//   })
-//   .catch(err => {
-//     console.error(err);
-//     alert("Server error.");
-//   });
-// }
-
-function selectLevel(lvl) {
+function goRandomLevel() {
+  const name = document.getElementById("playerName").value.trim();
+  if (!name) {
+    alert("Please enter your name!");
+    return;
+  }
+  playerName = name;
   score = 0;
-  scoreDisplay.textContent = `🏆 Score: ${score}`;
-  level = lvl;
+  level = 4;
   stage = 1;
+  scoreDisplay.textContent = `🏆 Score: ${score}`;
+  home.classList.remove("active");
+  navbar.style.display = "flex";
+  game.classList.add("active");
   startGame();
 }
 
@@ -353,14 +279,9 @@ function startGame() {
   for (let i = 0; i < boxCount; i++) {
     const box = document.createElement("div");
     box.className = "box";
-    box.setAttribute("ondrop", "drop(event)");
-    box.setAttribute("ondragover", "allowDrop(event)");
+    box.onclick = () => boxClicked(box);
     boxContainer.appendChild(box);
   }
-
-  // Comment these out if you don't want them visible
-  // levelDisplay.textContent = `🔢 Level: ${level}`;
-  // stageDisplay.textContent = `🎯 Stage: ${stage} / 10`;
 
   startTimer();
 
@@ -370,20 +291,26 @@ function startGame() {
     div.className = "number";
     div.textContent = num;
     div.id = "num" + idx;
-
-    if (!isMobile) {
-      div.draggable = true;
-      div.setAttribute("ondragstart", "drag(event)");
-    } else {
-      div.addEventListener("click", () => selectNumber(div));
-    }
-
+    div.onclick = () => numberClicked(div);
     draggables.appendChild(div);
   });
+}
 
-  if (isMobile) {
-    setupTapBoxes();
-  }
+function numberClicked(el) {
+  document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedNumber = el;
+}
+
+function boxClicked(box) {
+  if (!selectedNumber || gameEnded) return;
+  const span = document.createElement("span");
+  span.textContent = selectedNumber.textContent;
+  box.appendChild(span);
+  selectedNumber.remove();
+  selectedNumber = null;
+  document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+  checkResult();
 }
 
 function startTimer() {
@@ -455,50 +382,6 @@ function shuffleArray(array) {
   return array;
 }
 
-function allowDrop(ev) {
-  ev.preventDefault();
-}
-
-function drag(ev) {
-  ev.dataTransfer.setData("text", ev.target.id);
-}
-
-function drop(ev) {
-  ev.preventDefault();
-  const data = ev.dataTransfer.getData("text");
-  const dragged = document.getElementById(data);
-  const targetBox = ev.target.closest('.box');
-  if (targetBox && dragged && !gameEnded) {
-    const span = document.createElement("span");
-    span.textContent = dragged.textContent;
-    targetBox.appendChild(span);
-    dragged.remove();
-    setTimeout(checkResult, 100);
-  }
-}
-
-function setupTapBoxes() {
-  document.querySelectorAll('.box').forEach(box => {
-    box.onclick = () => {
-      if (selectedNumber && !gameEnded) {
-        const span = document.createElement("span");
-        span.textContent = selectedNumber.textContent;
-        box.appendChild(span);
-        selectedNumber.remove();
-        selectedNumber = null;
-        document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
-        checkResult();
-      }
-    }
-  });
-}
-
-function selectNumber(numberEl) {
-  document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
-  numberEl.classList.add('selected');
-  selectedNumber = numberEl;
-}
-
 function checkResult() {
   if (gameEnded) return;
   resultMessage.textContent = "";
@@ -545,10 +428,6 @@ function advanceStage(won) {
 function switchLanguage() {
   alert("Switching to Arabic would reload the page with Arabic text. This is just a placeholder.");
 }
-
-window.allowDrop = allowDrop;
-window.drag = drag;
-window.drop = drop;
 </script>
 </body>
 </html>
