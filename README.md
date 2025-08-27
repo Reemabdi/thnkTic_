@@ -43,7 +43,7 @@ The game is designed with **three main levels**, each increasing in difficulty:
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 - HTML5
 - CSS3
@@ -51,6 +51,10 @@ The game is designed with **three main levels**, each increasing in difficulty:
 
 ---
 
-## 🔗 Live Demo
+##  Live Demo
 
+---
 
+## Try it out !
+
+https://reemabdi.github.io/thnkTic_/
