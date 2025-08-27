@@ -51,7 +51,11 @@ The game is designed with **three main levels**, each increasing in difficulty:
 
 ---
 
-##  Live Demo
+## 🎮 Game Demo
+
+Watch the live demo below:
+
+<video src="https://github.com/user-content/gifs/reenabdi/thnkTic_/issue-2/GameDemo.mp4" controls width="600"></video>
 
 ---
 
